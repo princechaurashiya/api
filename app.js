@@ -7,6 +7,11 @@ const User = require('./models/User');
 const app = express();
 app.use(express.json());
 
+// Status route
+app.get('/status', (req, res) => {
+  res.status(200).json({ message: 'Server is running successfully!' });
+});
+
 // Register route
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
@@ -44,5 +49,5 @@ app.post('/login', async (req, res) => {
 });
 
 // Start server
-const PORT = 3000;
+const PORT = 3002;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
