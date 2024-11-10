@@ -1,18 +1,22 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-// Create a connection pool to manage MySQL connections
-const pool = mysql.createPool(
-  process.env.JAWSDB_URL || { // Use JAWSDB_URL if available, otherwise use local .env variables
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10, // Set the maximum number of connections in the pool
-    queueLimit: 0
-  }
-);
+// The MySQL URL you provided
+const mysqlUrl = 'mysql://bpv9vkdc7l1kxgmo:hjh0ugsjzoj6856s@u28rhuskh0x5paau.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/snirktk774fftt78';
+
+// Parse the URL
+const url = new URL(mysqlUrl);
+
+// Create a connection pool using the parsed URL
+const pool = mysql.createPool({
+  host: url.hostname,
+  user: url.username,
+  password: url.password,
+  database: url.pathname.split('/')[1], // Extract database name from the URL
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
 pool.getConnection((err, connection) => {
   if (err) {
