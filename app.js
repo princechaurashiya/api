@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
+//const port = process.env.PORT || 8000;
 
 const app = express();
 app.use(express.json());
