@@ -1,18 +1,12 @@
 const mysql = require('mysql2');
-require('dotenv').config();
+require('dotenv').config();  // Load environment variables
 
-// The MySQL URL you provided
-const mysqlUrl = 'mysql://bpv9vkdc7l1kxgmo:hjh0ugsjzoj6856s@u28rhuskh0x5paau.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/snirktk774fftt78';
-
-// Parse the URL
-const url = new URL(mysqlUrl);
-
-// Create a connection pool using the parsed URL
+// Create a connection pool using the environment variables
 const pool = mysql.createPool({
-  host: url.hostname,
-  user: url.username,
-  password: url.password,
-  database: url.pathname.split('/')[1], // Extract database name from the URL
+  host: process.env.DB_HOST,       // localhost
+  user: process.env.DB_USER,       // root (or your MySQL username)
+  password: process.env.DB_PASSWORD, // Your MySQL password
+  database: process.env.DB_NAME,   // Your database name
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -27,4 +21,4 @@ pool.getConnection((err, connection) => {
   }
 });
 
-module.exports = pool.promise(); // Export a promise-based pool
+module.exports = pool.promise();  // Export the promise-based pool

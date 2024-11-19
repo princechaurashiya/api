@@ -3,10 +3,32 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
-//const port = process.env.PORT || 8000;
 
 const app = express();
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express"); // Correct module for Swagger UI
+const { version } = require('mongoose');
+
 app.use(express.json());
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Node Js API Project for SQL",
+      version: "1.0.0",
+    },
+    servers: [
+      {
+        url: "http://localhost:3004/",
+      },
+    ],
+  },
+  apis: ["./app.js"], // File containing Swagger definitions
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Status route
 app.get('/status', (req, res) => {
@@ -34,7 +56,7 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findUserByEmail(email);
-    
+
     if (!user) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }

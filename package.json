@@ -4,15 +4,17 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-     "migrate": "sequelize-cli db:migrate",
+    "migrate": "sequelize-cli db:migrate",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^10.0.0",
     "express": "^4.21.1",
-    "jsonwebtoken": "^8.5.1",
-    "mysql2": "^3.0.0"
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "author": "",
   "license": "ISC",
