@@ -2,33 +2,34 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('./models/User');
+const User = require('./models/User'); // Your user model
+const proff = require('./models/profetionals_registration'); // Your user model
+
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
-const swaggerJSDoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express"); // Correct module for Swagger UI
-const { version } = require('mongoose');
+app.use(express.json()); // Middleware to parse JSON requests
 
-app.use(express.json());
-
+// Swagger setup
 const options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
-      title: "Node Js API Project for SQL",
-      version: "1.0.0",
+      title: 'Node.js API Project for SQL',
+      version: '1.0.0',
     },
     servers: [
       {
-        url: "http://localhost:3004/",
+        url: 'http://localhost:3004/',
       },
     ],
   },
-  apis: ["./app.js"], // File containing Swagger definitions
+  apis: ['./app.js'], // Adjust this if API documentation is elsewhere
 };
 
 const swaggerSpec = swaggerJSDoc(options);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Status route
 app.get('/status', (req, res) => {
@@ -37,33 +38,51 @@ app.get('/status', (req, res) => {
 
 // Register route
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body; // Extract email and password from request body
+
+  console.log(email)
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
   try {
-    const existingUser = await User.findUserByEmail(email);
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
+    // Register the user using the User model
     await User.registerUser(email, password);
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Registration failed' });
+    if (err.code === 'ER_DUP_ENTRY') {
+      // Handle duplicate email error for MySQL
+      res.status(400).json({ error: 'Email already exists' });
+    } else {
+      res.status(500).json({ error: 'Registration failed' });
+    }
   }
 });
 
 // Login route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
   try {
+    // Find the user by email
     const user = await User.findUserByEmail(email);
 
     if (!user) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
+
+    // Compare the password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
+
+    // Generate a JWT token
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ message: 'Login successful', token });
   } catch (err) {
@@ -71,6 +90,34 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Login failed' });
   }
 });
+
+
+// profesonal
+app.post('/prof', async (req, res) => {
+  const { firstName, lastName, work, experience, img, email, ploneNo, serviceCharge, aadhar, pan } = req.body; 
+  // Extract email and password from request body
+
+   // if (!email || !password) {
+  //   return res.status(400).json({ error: 'Email and password are required' });
+  // }
+
+  try {
+    // Register the user using the User model
+    await proff.registerProfasonal(firstName, lastName, work, experience, img, email, ploneNo, serviceCharge, aadhar, pan);
+
+    res.status(201).json({ message: 'User registered successfully!' });
+  } catch (err) {
+    console.error(err);
+    if (err.code === 'ER_DUP_ENTRY') {
+      // Handle duplicate email error for MySQL
+      res.status(400).json({ error: 'Email already exists' });
+    } else {
+      res.status(500).json({ error: 'Registration failed' });
+    }
+  }
+});
+
+
 
 // Start server
 const PORT = process.env.PORT || 3004;
