@@ -5,6 +5,9 @@ const pool = require('../config/db'); // Import the connection pool
 async function registerUser(email, password) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const query = 'INSERT INTO users (email, password) VALUES (?, ?)';
+
+
+  //
   
   try {
     const [results] = await pool.execute(query, [email, hashedPassword]); // Use `execute` instead of `query`
