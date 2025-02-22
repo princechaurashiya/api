@@ -1,32 +1,40 @@
 const bcrypt = require('bcryptjs');
-const pool = require('../config/db'); // Import the connection pool
+require('../db/connections'); // Import the connection pool
+let vaildate=require('validator')
+let mongoose=require('mongoose')
+ 
+let UserSchema=new mongoose.Schema({
+  name:{
+    type:String,
+     required:true
 
-// User registration (create a new user in MySQL)
-async function registerUser(email, password) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const query = 'INSERT INTO users (email, password) VALUES (?, ?)';
+  },
+  email:{
+    type: String,
+    required:true,
+    unique:true,
+    vaildate(value){
+      if(!vaildate.isEmail(value)){
+        throw new Error('enter valid email')
+      }
+    }
+  },
+  password:{
+    type:String
+  },
+   
+  Role:{
+    type:String
+  },
+  phone:{
+    type:String
 
+  },
+  address:{
+    type:String
 
-  //
-  
-  try {
-    const [results] = await pool.execute(query, [email, hashedPassword]); // Use `execute` instead of `query`
-    return results;
-  } catch (err) {
-    throw err;
   }
-}
+})
 
-// Find user by email
-async function findUserByEmail(email) {
-  const query = 'SELECT * FROM users WHERE email = ?';
-  
-  try {
-    const [results] = await pool.execute(query, [email]); // Use `execute` here as well
-    return results[0]; // Assuming email is unique, return the first result
-  } catch (err) {
-    throw err;
-  }
-}
-
-module.exports = { registerUser, findUserByEmail };
+let User=new mongoose.model('User',UserSchema);
+module.exports=User
