@@ -1,20 +1,55 @@
-const pool = require('../config/db');
+    const bcrypt = require('bcryptjs');
+  require('../db/connections');  
+  let vaildate=require('validator')
+  let mongoose=require('mongoose')
+   
+  let Profasonal_Schema=new mongoose.Schema({
+    Name:{
+      type:String,
+   
+    },
+    email:{
+      type: String,
+       unique:true,
+      vaildate(value){
+        if(!vaildate.isEmail(value)){
+          throw new Error('enter valid email')
+        }
+      }
+    },
+    work:{
+      type:String,
+   
+    }, experience:{
+      type:String,
+   
+    }, img:{
+      type:String,
+   
+    }, phoneNo:{
+      type:String,
+   
+    }, serviceCharge:{
+      type:String,
+   
+    }, aadhar:{
+      type:String,
+   
+    }, pan:{
+      type:String,
+   
+    }, 
+    fees:{
+      type:Number
+    },
+    Role:{
+      type:String,
 
-async function registerProfasonal(firstName, lastName, work, experience, img, email, ploneNo, serviceCharge, aadhar, pan) {
-  const query = `
-    INSERT INTO proffesonial 
-    (firstName, lastName, work, experience, img, email, ploneNo, serviceCharge, aadhar, pan) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  try {
-    const [results] = await pool.execute(query, [
-      firstName, lastName, work, experience, img, email, ploneNo, serviceCharge, aadhar, pan
-    ]);
-    return results;
-  } catch (err) {
-    throw err;
-  }
-}
-
-module.exports = { registerProfasonal };
+    },
+    ratting:{
+      type:Number
+    }
+  })
+  
+  let Profasonals=new mongoose.model('Profasonals',Profasonal_Schema);
+  module.exports=Profasonals
