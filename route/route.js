@@ -19,14 +19,15 @@ rout.get('/status', (req, res) => {
     res.status(200).json({ message: 'Server is running successfully!' });
   });
   
-  // Register route
+  
+  
   rout.post('/register', async (req, res) => {
     const DATA = req.body; // Extract email and password from request body
   let payload={...DATA,Role:'General'}
     try {
         let ExisUser=await User.findOne({email:payload.email});
         if(payload.Cpassword){
-        if ( payload.password!==payload.Cpassword){
+        if ( payload.password !== payload.Cpassword){
             throw new Error('Enter same password');
 
                 }
@@ -51,6 +52,8 @@ let Data=await  NewUser.save();
       }
     }
   });
+
+  
   
   // Login route
   rout.post('/login', async (req, res) => {
