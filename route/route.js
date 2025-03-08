@@ -25,10 +25,12 @@ rout.get('/status', (req, res) => {
   let payload={...DATA,Role:'General'}
     try {
         let ExisUser=await User.findOne({email:payload.email});
+        if(payload.Cpassword){
         if ( payload.password!==payload.Cpassword){
             throw new Error('Enter same password');
 
-        }
+                }
+                 }
         if(ExisUser ){
             throw new Error('Already Loging user');
         }
