@@ -17,6 +17,7 @@
     "mongoose": "^8.8.3",
     "mysql2": "^3.0.0",
     "nodemon": "^3.1.7",
+    "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "validator": "^13.12.0"
@@ -24,5 +25,8 @@
   "author": "",
   "license": "ISC",
   "keywords": [],
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
 }
