@@ -3,9 +3,19 @@ const express = require('express');
  const app = express();
 let router=require('./route/route')
 require('./db/connections')
-let cors=require('cors')
+//let cors=require('cors')
 app.use(express.json()); // Middleware to parse JSON requests
 let cookie=require('cookie-parser')
+
+const cors = require("cors");
+
+app.use(cors({
+  origin: "*", // Ya specific frontend URL: "http://localhost:3000"
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
 
 
 // Swagger setup
@@ -37,6 +47,6 @@ app.use(router)
    res.send('data come ')
  })
 
-// Start server
+//Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
