@@ -18,6 +18,21 @@ rout.use(cookie())
 rout.get('/status', (req, res) => {
     res.status(200).json({ message: 'Server is running successfully!' });
   });
+
+
+  rout.get('/get-messages/:id', async (req, res) => {
+    try {
+      const userId = req.params.id;  // Get the user ID from the route
+      const messages = await Message.find({ userId });  // Fetch messages for the user
+      res.status(200).json({ messages });  // Send the messages in the response
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Unable to fetch messages' });
+    }
+  });
+  
+
+  
   
   
   
@@ -56,60 +71,68 @@ let Data=await  NewUser.save();
   
   
   // Login route
-  rout.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-      try {
+rout.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    if (email == '' || password == '') {
+      throw new Error('Fill Login Properly');
+    }
+``
+    // Find the user by email
+    const user = await User.findOne({ email: email });
 
-   if(email==''|| password==''){
-    throw new Error('Fill  Loign Properly')
-   }
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    
+    // Add JWT token to response (auth_key)
+    console.log(token);
+    res.cookie('jwt', token, { expiresIn: '30d', httpOnly: true, secure: true });
+
+    // Include auth_key in the response JSON
+    res.json({ 
+      message: 'Login successful', 
+      success: true, 
+      auth_key: token // Sending token as auth_key
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
   
-      // Find the user by email
-      const user = await User.findOne({email:email});
-  
-      if (!user) {
-        return res.status(400).json({ error: 'Invalid email or password' });
-      }
-  
-      // Compare the password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ error: 'Invalid email or password' });
-      }
-  
-      // Generate a JWT token
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-     
-     console.log(token);
-      res.cookie('jwt',token,{expiresIn:'30d',httpOnly:true,secure:true})
-      res.json({ message: 'Login successful', success:true });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Login failed' });
+  // to see  All login user 
+  rout.get('/see-user', auth, async (req, res) => {
+    try {
+      let data = await User.find();
+    // console.log(data)
+      res.json({
+        status: 200,
+        success: true,
+        error: false,
+        data: data
+      });
+    } catch (e) {
+      res.json({
+        error: true,
+        status: 404,
+        success: false,
+        mess: e.message,
+      });
     }
   });
   
-  // to see  All login user 
-  rout.get('/see-user',auth,async(req,res)=>{
-try{
-let data=await User.find();
-res.json({
-  status:200,
-  success:true,
-  error:false,
-  data:data
-})
-
-}
-catch(e){
-  res.json({
-    error:true,
-    status:404,
-    success:false,
-    mess:e.massage,
-  })
-}
-  })
 
    // to logout user 
    rout.delete('/Delete-user/:id',auth,async(req,res)=>{
